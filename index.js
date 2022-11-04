@@ -24,17 +24,12 @@ mqtt_client.on('connect', function () {
     mqtt_client.subscribe(mqtt_topic, function (err) {
         console.log(`subscribed to ${mqtt_topic}`)
     })
-    sendText() //tests to see if text sends proper message
 })
-//mqtt_client.subscribe(mqtt_topic)
 
-var mqtt_response = null
 mqtt_client.on('message', function (topic, message) {
-console.log(message)
-mqtt_response = message.toString()
-if(mqtt_response == 'send_text'){
+if(message.toString() == '30836'){ // 30836 is code for a tripped sensor in this system
+    console.log(mqtt_response)
     sendText()
-    mqtt_response = null
 }
 })
 
@@ -57,7 +52,7 @@ function sendText(){
 function getDateAndTime(){
     let currentDate = new Date()
     var day = currentDate.getDate()
-    var month = currentDate.getMonth()
+    var month = currentDate.getMonth() 
     var year = currentDate.getFullYear()
     var hours = currentDate.getHours()
     var minutes = currentDate.getMinutes()
@@ -65,7 +60,7 @@ function getDateAndTime(){
     hours = hours % 12
     hours = hours ? hours : 12; // the hour '0' should be '12'
     minutes = minutes < 10 ? '0'+minutes : minutes;
-    month = month < 10 ? '0'+month : month;
+    month = month < 10 ? '0'+month : month + 1;
     day = day < 10 ? '0'+day : day;
     var date_and_time = hours + ':' + minutes + ' ' + ampm + ' on ' + month + "/" + day + "/" + year;
     return date_and_time
