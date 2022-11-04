@@ -18,26 +18,28 @@ TWILIO_ACCOUNT_SID,
 TWILIO_AUTH_TOKEN
 );
 
+//subscribes to mqtt topic
 mqtt_topic = 'protocol_receiver_arduino_lab2'
 mqtt_client.on('connect', function () {
-mqtt_client.subscribe(mqtt_topic, function (err) {
-    console.log(`Subscribed to ${mqtt_topic}`)
+    mqtt_client.subscribe(mqtt_topic, function (err) {
+        console.log(`subscribed to ${mqtt_topic}`)
+    })
+    sendText() //tests to see if text sends proper message
 })
-})
+//mqtt_client.subscribe(mqtt_topic)
 
-
-count = 0
+var mqtt_response = null
 mqtt_client.on('message', function (topic, message) {
-text = message.toString()
-if (count < 3) {
+console.log(message)
+mqtt_response = message.toString()
+if(mqtt_response == 'send_text'){
     sendText()
-    count++
+    mqtt_response = null
 }
 })
 
 function sendText(){
     var alert = "Critical Safety Event at " + getDateAndTime()
-    res.header('Content-Type', 'application/json');
     twilio_client.messages
     .create({
       from: TWILIO_PHONE_NUMBER,
@@ -45,11 +47,10 @@ function sendText(){
       body: alert
     })
     .then(() => {
-      res.send(JSON.stringify({ success: true }));
+      console.log("sms successfully sent")
     })
     .catch(err => {
-      console.log(err);
-      res.send(JSON.stringify({ success: false }));
+      console.log("error with sms: " + err)
     });
 };
 
@@ -70,8 +71,5 @@ function getDateAndTime(){
     return date_and_time
 }
 
-
-
-
 const PORT = process.env.PORT || 4000
-app.listen(PORT, () =>  console.log(`Server running on port ${PORT}`))
+app.listen(PORT, () =>  console.log(`server running on port ${PORT}`))
